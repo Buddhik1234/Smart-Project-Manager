@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Project Manager</title>
+    <meta name="description"
+        content="Smart Project Manager - Organize projects, track progress, and boost productivity with phases, weeks, days, and materials.">
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <svg width="80" height="80" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="loadGrad1" x1="0%" y1="100%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#1E8F47;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#5CE38D;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="loadGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#5CE38D;stop-opacity:0.9" />
+                            <stop offset="100%" style="stop-color:#2ECC71;stop-opacity:0.6" />
+                        </linearGradient>
+                    </defs>
+                    <rect x="5" y="5" width="110" height="110" rx="24" fill="#202020" stroke="url(#loadGrad1)"
+                        stroke-width="3" />
+                    <rect x="22" y="68" width="16" height="30" rx="4" fill="url(#loadGrad2)" opacity="0.6" />
+                    <rect x="44" y="48" width="16" height="50" rx="4" fill="url(#loadGrad2)" opacity="0.8" />
+                    <rect x="66" y="32" width="16" height="66" rx="4" fill="url(#loadGrad1)" />
+                    <path d="M50 38 L62 50 L88 24" stroke="#5CE38D" stroke-width="5" stroke-linecap="round"
+                        stroke-linejoin="round" fill="none" />
+                </svg>
+            </div>
+            <h1 class="loading-title">Smart Project Manager</h1>
+            <div class="loading-bar-track">
+                <div class="loading-bar-fill"></div>
+            </div>
+            <p class="loading-subtitle">Loading your workspace...</p>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Helper -->
+    <div id="shortcuts-panel" class="shortcuts-panel hidden">
+        <h3>Keyboard Shortcuts</h3>
+        <div class="shortcut-list">
+            <div class="shortcut-item"><kbd>Ctrl+N</kbd> <span>New Item</span></div>
+            <div class="shortcut-item"><kbd>Ctrl+F</kbd> <span>Search</span></div>
+            <div class="shortcut-item"><kbd>Ctrl+H</kbd> <span>Home</span></div>
+            <div class="shortcut-item"><kbd>Ctrl+T</kbd> <span>Toggle Theme</span></div>
+            <div class="shortcut-item"><kbd>Ctrl+E</kbd> <span>Export Data</span></div>
+            <div class="shortcut-item"><kbd>?</kbd> <span>Show Shortcuts</span></div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 id="sidebar-title">Projects</h2>
+                <button class="add-btn" id="sidebar-add-btn" title="Add New"><i class="fas fa-plus"></i></button>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <input type="text" id="global-search" placeholder="Search..." class="search-input">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+
+            <div class="sidebar-content" id="sidebar-list">
+            </div>
+
+            <div class="sidebar-footer">
+                <button id="settings-btn" class="btn-main">
+                    <i class="fas fa-cog"></i> Settings
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div id="nav-header" class="nav-header"></div>
+
+            <div class="content-wrapper">
+                <div class="header-section">
+                    <div class="title-block">
+                        <h1 id="page-title">Dashboard</h1>
+                        <div class="subtitle-wrapper">
+                            <p id="page-subtitle">Overview</p>
+                            <i class="fas fa-pencil-alt" id="edit-subtitle-btn"></i>
+                        </div>
+                    </div>
+                    <div class="progress-block">
+                        <div class="progress-labels">
+                            <span>Progress</span>
+                            <span id="progress-text">0%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="main-progress-bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <!-- Home Page - Projects Grid -->
+                <div id="home-page" class="home-page">
+                    <div class="projects-grid" id="projects-grid">
+                        <!-- Projects will be dynamically added here -->
+                    </div>
+                </div>
+
+                <!-- Project Analysis Dashboard -->
+                <div id="project-analysis-dashboard" class="project-analysis-dashboard" style="display: none;">
+                    <div class="analysis-overview">
+                        <div class="overview-card glass-effect">
+                            <i class="fas fa-tasks"></i>
+                            <h3>Total Tasks</h3>
+                            <p class="overview-number" id="analysis-total-tasks">0</p>
+                        </div>
+                        <div class="overview-card glass-effect">
+                            <i class="fas fa-check-circle"></i>
+                            <h3>Completed</h3>
+                            <p class="overview-number" id="analysis-completed-tasks">0</p>
+                        </div>
+                        <div class="overview-card glass-effect">
+                            <i class="fas fa-layer-group"></i>
+                            <h3>Phases</h3>
+                            <p class="overview-number" id="analysis-total-phases">0</p>
+                        </div>
+                        <div class="overview-card glass-effect">
+                            <i class="fas fa-calendar-week"></i>
+                            <h3>Weeks</h3>
+                            <p class="overview-number" id="analysis-total-weeks">0</p>
+                        </div>
+                        <div class="overview-card glass-effect">
+                            <i class="fas fa-calendar-day"></i>
+                            <h3>Days</h3>
+                            <p class="overview-number" id="analysis-total-days">0</p>
+                        </div>
+                        <div class="overview-card glass-effect">
+                            <i class="fas fa-percentage"></i>
+                            <h3>Completion Rate</h3>
+                            <p class="overview-number" id="analysis-completion-rate">0%</p>
+                        </div>
+                    </div>
+
+                    <div class="analysis-details">
+                        <div class="detail-card glass-effect">
+                            <h3><i class="fas fa-chart-pie"></i> Task Breakdown</h3>
+                            <canvas id="task-breakdown-chart"></canvas>
+                        </div>
+                        <div class="detail-card glass-effect">
+                            <h3><i class="fas fa-chart-bar"></i> Phase Progress</h3>
+                            <div id="phase-progress-list"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Calendar View -->
+                <div id="project-calendar-view" class="project-calendar-view" style="display: none;">
+                    <div class="calendar-controls">
+                        <button id="cal-prev-month" class="btn-outline"><i class="fas fa-chevron-left"></i></button>
+                        <h3 id="cal-month-year"></h3>
+                        <button id="cal-next-month" class="btn-outline"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="calendar-grid" id="project-calendar-grid">
+                        <!-- Calendar will be rendered here -->
+                    </div>
+                    <div class="calendar-legend">
+                        <span><span class="legend-dot work-day"></span> Work Day</span>
+                        <span><span class="legend-dot today"></span> Today</span>
+                    </div>
+                </div>
+
+                <!-- Main List Container (for phases/weeks/days/tasks) -->
+                <div id="main-list-container" class="main-list-container">
+                </div>
+
+                <!-- Project Structure -->
+                <div id="structure-view" style="display: none;">
+                    <h2>Project Structure</h2>
+                    <p class="help-text">Enable the organizational levels you need for this project:</p>
+
+                    <div class="structure-options">
+                        <label class="structure-option glass-effect">
+                            <div class="option-content">
+                                <div class="option-header">
+                                    <i class="fas fa-layer-group"></i>
+                                    <strong>Phases</strong>
+                                </div>
+                                <p>Major project stages (e.g., Planning, Development, Testing)</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="struct-phases" onchange="updateProjectStructure()">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </label>
+
+                        <label class="structure-option glass-effect">
+                            <div class="option-content">
+                                <div class="option-header">
+                                    <i class="fas fa-calendar-week"></i>
+                                    <strong>Weeks</strong>
+                                </div>
+                                <p>Weekly milestones within phases</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="struct-weeks" onchange="updateProjectStructure()">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </label>
+
+                        <label class="structure-option glass-effect">
+                            <div class="option-content">
+                                <div class="option-header">
+                                    <i class="fas fa-calendar-day"></i>
+                                    <strong>Days</strong>
+                                </div>
+                                <p>Daily tasks and schedules</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="struct-days" onchange="updateProjectStructure()">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </label>
+
+                        <label class="structure-option glass-effect">
+                            <div class="option-content">
+                                <div class="option-header">
+                                    <i class="fas fa-folder"></i>
+                                    <strong>Materials</strong>
+                                </div>
+                                <p>Notes, files, videos, and links</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="struct-materials" onchange="updateProjectStructure()">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Materials View -->
+                <div id="materials-view" style="display: none;">
+                    <div class="materials-context-selector">
+                        <label for="materials-context">Viewing materials for:</label>
+                        <select id="materials-context" class="context-select"
+                            onchange="switchMaterialsContext(this.value)">
+                            <option value="project">Entire Project</option>
+                        </select>
+                    </div>
+
+                    <div class="materials-tabs">
+                        <button class="materials-tab active" onclick="switchMaterialsTab('notes')">
+                            <i class="fas fa-sticky-note"></i> Notes
+                        </button>
+                        <button class="materials-tab" onclick="switchMaterialsTab('videos')">
+                            <i class="fas fa-video"></i> Video Guides
+                        </button>
+                        <button class="materials-tab" onclick="switchMaterialsTab('files')">
+                            <i class="fas fa-file"></i> Files
+                        </button>
+                        <button class="materials-tab" onclick="switchMaterialsTab('links')">
+                            <i class="fas fa-link"></i> Links
+                        </button>
+                    </div>
+
+                    <!-- Notes Tab -->
+                    <div id="materials-notes" class="materials-tab-content active">
+                        <div class="list-header small-header">
+                            <h3>Notes</h3>
+                            <button class="add-text-btn" id="add-note-btn"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <div id="notes-list-container" class="notes-stack">
+                        </div>
+                    </div>
+
+                    <!-- Videos Tab -->
+                    <div id="materials-videos" class="materials-tab-content">
+                        <h3>Video Guides</h3>
+                        <div class="video-input-wrapper">
+                            <input type="text" id="youtube-url" class="glass-input"
+                                placeholder="Paste YouTube Link here...">
+                            <button id="add-video-btn" class="btn-green">Add Video</button>
+                        </div>
+                        <div id="video-list-container" class="video-stack">
+                        </div>
+                    </div>
+
+                    <!-- Files Tab -->
+                    <div id="materials-files" class="materials-tab-content">
+                        <h3>Files</h3>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="file-upload-input" class="hidden" multiple>
+                            <button id="add-file-btn" class="btn-green">
+                                <i class="fas fa-upload"></i> Add Files
+                            </button>
+                        </div>
+                        <div id="files-list-container" class="files-stack">
+                        </div>
+                    </div>
+
+                    <!-- Links Tab -->
+                    <div id="materials-links" class="materials-tab-content">
+                        <h3>Links</h3>
+                        <div class="link-input-wrapper">
+                            <input type="text" id="link-url" class="glass-input" placeholder="Enter website link">
+                            <button id="add-link-btn" class="btn-green">Add Link</button>
+                        </div>
+                        <div id="links-list-container" class="links-stack">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content glass-effect">
+            <span class="close-modal">&times;</span>
+            <h2>Settings & Data Management</h2>
+
+            <!-- Theme Selection -->
+            <div class="settings-section">
+                <h3>Theme</h3>
+                <div class="theme-selector">
+                    <button onclick="setTheme('dark')" class="theme-btn" data-theme="dark">Dark</button>
+                    <button onclick="setTheme('blue')" class="theme-btn" data-theme="blue">Ocean</button>
+                    <button onclick="setTheme('purple')" class="theme-btn" data-theme="purple">Purple</button>
+                    <button onclick="setTheme('orange')" class="theme-btn" data-theme="orange">Sunset</button>
+                </div>
+            </div>
+
+            <!-- Data Management -->
+            <div class="settings-section">
+                <h3>Data</h3>
+                <div class="modal-actions settings-data-actions">
+                    <button id="export-btn" class="btn-green"><i class="fas fa-download"></i> Export Data</button>
+                    <label for="import-file" class="btn-outline">
+                        <i class="fas fa-upload"></i> Import Data
+                    </label>
+                    <input type="file" id="import-file" accept=".json" hidden>
+                </div>
+            </div>
+
+            <p id="backup-status" class="status-text"></p>
+        </div>
+    </div>
+
+    <!-- Project Template Modal -->
+    <div id="template-modal" class="modal">
+        <div class="modal-content glass-effect">
+            <span class="close-modal" onclick="closeTemplateModal()">&times;</span>
+            <h2>Choose Project Template</h2>
+            <p class="help-text">Select a template to get started quickly, or create a blank project:</p>
+
+            <div class="template-grid">
+                <div class="template-card" onclick="createProjectFromTemplate('blank')">
+                    <i class="fas fa-file"></i>
+                    <h3>Blank Project</h3>
+                    <p>Start from scratch</p>
+                </div>
+                <div class="template-card" onclick="createProjectFromTemplate('phased')">
+                    <i class="fas fa-layer-group"></i>
+                    <h3>Phased Project</h3>
+                    <p>With phases and goals</p>
+                </div>
+                <div class="template-card" onclick="createProjectFromTemplate('weekly')">
+                    <i class="fas fa-calendar-week"></i>
+                    <h3>Weekly Plan</h3>
+                    <p>Organized by weeks</p>
+                </div>
+                <div class="template-card" onclick="createProjectFromTemplate('daily')">
+                    <i class="fas fa-calendar-day"></i>
+                    <h3>Daily Tracker</h3>
+                    <p>Day-by-day tasks</p>
+                </div>
+                <div class="template-card" onclick="createProjectFromTemplate('full')">
+                    <i class="fas fa-project-diagram"></i>
+                    <h3>Complete Structure</h3>
+                    <p>Phases, weeks, & days</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Modal -->
+    <div id="input-modal" class="modal">
+        <div class="modal-content glass-effect">
+            <h2 id="modal-title">Edit Item</h2>
+            <input type="text" id="modal-input" placeholder="Enter text here..." autocomplete="off">
+            <textarea id="modal-textarea" placeholder="Enter description..." class="hidden"></textarea>
+            <input type="date" id="modal-date-input" class="hidden">
+            <div class="modal-actions">
+                <button id="modal-cancel" class="btn-outline">Cancel</button>
+                <button id="modal-save" class="btn-green">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
